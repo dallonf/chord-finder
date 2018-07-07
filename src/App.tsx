@@ -1,20 +1,29 @@
 import * as React from 'react';
 import * as _ from 'lodash';
-import { MIDDLE_C, Interval, C_MAJOR, NoteIdentity } from './theory/types';
-import { majorTriad } from './theory/chords';
+import {
+  MIDDLE_C,
+  Interval,
+  C_MAJOR,
+  NoteIdentity,
+  ChordIdentity,
+} from './theory/types';
+import { notesForChord } from './theory/chords';
 import { absoluteNoteToIdentity } from './theory/conversion';
 
 const ALL_TRIADS = _.flatMap(_.range(MIDDLE_C, Interval.OCTAVE), note => [
   {
     root: absoluteNoteToIdentity(note, C_MAJOR),
     type: 'major',
-    notes: majorTriad(note).map(x => absoluteNoteToIdentity(x, C_MAJOR)),
   },
-]);
+  {
+    root: absoluteNoteToIdentity(note, C_MAJOR),
+    type: 'minor',
+  },
+]) as ChordIdentity[];
 console.log(ALL_TRIADS);
 
 const Note = ({ note }: { note: NoteIdentity }) => (
-  <span>
+  <React.Fragment>
     {note.name}
     {(() => {
       switch (note.type) {
@@ -22,6 +31,21 @@ const Note = ({ note }: { note: NoteIdentity }) => (
           return 'b';
         case 'sharp':
           return '#';
+      }
+      return undefined;
+    })()}
+  </React.Fragment>
+);
+
+const ChordName = ({ chord }: { chord: ChordIdentity }) => (
+  <span>
+    <Note note={chord.root} />
+    {(() => {
+      switch (chord.type) {
+        case 'major':
+          return undefined;
+        case 'minor':
+          return 'm';
       }
       return undefined;
     })()}
@@ -37,12 +61,12 @@ class App extends React.Component {
           {ALL_TRIADS.map((x, i) => (
             <li key={i}>
               <strong>
-                <Note note={x.root} />:
+                <ChordName chord={x} />:
               </strong>{' '}
-              {x.notes.map((y, i) => (
+              {notesForChord(x, C_MAJOR).map((y, i, arr) => (
                 <React.Fragment key={i}>
                   <Note note={y} />
-                  {i !== x.notes.length - 1 && ' '}
+                  {i !== arr.length - 1 && ' '}
                 </React.Fragment>
               ))}
             </li>

@@ -51,3 +51,7 @@ export const C_MAJOR: Scale = {
   tonic: createNote('C'),
   mode: 'major',
 };
+export interface ChordIdentity {
+  root: NoteIdentity;
+  type: 'major' | 'minor';
+}

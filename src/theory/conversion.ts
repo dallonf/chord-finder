@@ -9,7 +9,7 @@ import {
 } from './types';
 
 /**
- * @param scale Used to calculate accidental
+ * @param scale Used to calculate accidental (TODO: actually do this)
  */
 export function absoluteNoteToIdentity(
   note: AbsoluteNote,
@@ -21,7 +21,62 @@ export function absoluteNoteToIdentity(
     k => NOTE_NAMES[k] === relative
   );
   if (!name) {
-    throw new Error(`Accidentals aren't supported yet`);
+    switch (relative) {
+      case NOTE_NAMES.C + 1:
+        return createNote('C', 'sharp');
+      case NOTE_NAMES.E - 1:
+        return createNote('E', 'flat');
+      case NOTE_NAMES.F + 1:
+        return createNote('F', 'sharp');
+      case NOTE_NAMES.A - 1:
+        return createNote('A', 'flat');
+      case NOTE_NAMES.B - 1:
+        return createNote('B', 'flat');
+      default:
+        throw new Error(`Catastrophic failure to identity note ${note}`);
+    }
   }
   return createNote(name);
+}
+
+/**
+ * Note that this only gets _one_ possible note that matches the identity,
+ * usually between middle C and treble C.
+ * `x` is not guaranteed to equal `getAbsoluteNoteForIdentity(absoluteNoteToIdentity(x))`!
+ */
+export function getAbsoluteNoteForIdentity(note: NoteIdentity): AbsoluteNote {
+  const natural = NOTE_NAMES[note.name];
+  return natural + note.type;
+}
+
+export function getNotesInScale(scale: Scale): NoteIdentity[] {
+  const tonic = getAbsoluteNoteForIdentity(scale.tonic);
+  let notes: AbsoluteNote[];
+  switch (scale.mode) {
+    case 'major':
+      notes = [
+        Interval.UNISON,
+        Interval.MAJOR_SECOND,
+        Interval.MAJOR_THIRD,
+        Interval.PERFECT_FOURTH,
+        Interval.PERFECT_FIFTH,
+        Interval.MAJOR_SIXTH,
+        Interval.MAJOR_SEVENTH,
+      ];
+      break;
+    case 'minor':
+      notes = [
+        Interval.UNISON,
+        Interval.MAJOR_SECOND,
+        Interval.MINOR_THIRD,
+        Interval.PERFECT_FOURTH,
+        Interval.PERFECT_FIFTH,
+        Interval.MINOR_SIXTH,
+        Interval.MINOR_SEVENTH,
+      ];
+      break;
+    default:
+      throw new Error(`Mode "${scale.mode}" is not yet supported`);
+  }
+  return notes.map(x => absoluteNoteToIdentity(tonic + x, scale));
 }

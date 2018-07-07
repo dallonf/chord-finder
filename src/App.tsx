@@ -42,7 +42,7 @@ class App extends React.Component {
   public render() {
     return (
       <div>
-        <h1>Every Triad Ever</h1>
+        <h1>Lots of triads</h1>
         <ul>
           {ALL_TRIADS.map((x, i) => (
             <li key={i}>

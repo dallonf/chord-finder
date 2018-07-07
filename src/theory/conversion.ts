@@ -46,7 +46,21 @@ export function absoluteNoteToIdentity(
  */
 export function getAbsoluteNoteForIdentity(note: NoteIdentity): AbsoluteNote {
   const natural = NOTE_NAMES[note.name];
-  return natural + note.type;
+  let modifier = 0;
+  switch (note.type) {
+    case 'natural':
+      modifier = 0;
+      break;
+    case 'sharp':
+      modifier = 1;
+      break;
+    case 'flat':
+      modifier = -1;
+      break;
+    default:
+      throw new Error(`Unrecognized note type "${note.type}"`);
+  }
+  return natural + modifier;
 }
 
 export function getNotesInScale(scale: Scale): NoteIdentity[] {

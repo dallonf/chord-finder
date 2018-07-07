@@ -14,11 +14,7 @@ export enum Interval {
   OCTAVE = 12,
 }
 
-export enum NoteType {
-  NATURAL = 0,
-  SHARP = 1,
-  FLAT = -1,
-}
+export type NoteType = 'natural' | 'sharp' | 'flat';
 
 export type Mode = 'major' | 'minor';
 
@@ -41,29 +37,10 @@ export interface NoteIdentity {
   name: NoteName;
   type: NoteType;
 }
-export const createNote = (
-  name: NoteName,
-  type: 'natural' | 'sharp' | 'flat' = 'natural'
-) => {
-  let enumType: NoteType;
-  switch (type) {
-    case 'natural':
-      enumType = NoteType.NATURAL;
-      break;
-    case 'sharp':
-      enumType = NoteType.SHARP;
-      break;
-    case 'flat':
-      enumType = NoteType.FLAT;
-      break;
-    default:
-      throw new Error(`Unrecognized note type "${type}"`);
-  }
-  return {
-    name,
-    type: enumType,
-  };
-};
+export const createNote = (name: NoteName, type: NoteType = 'natural') => ({
+  name,
+  type,
+});
 
 export interface Scale {
   tonic: NoteIdentity;

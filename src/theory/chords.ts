@@ -1,4 +1,12 @@
-import { AbsoluteNote, Interval, ChordIdentity, Scale } from './types';
+import * as _ from 'lodash';
+import {
+  AbsoluteNote,
+  Interval,
+  ChordIdentity,
+  Scale,
+  MIDDLE_C,
+  C_MAJOR,
+} from './types';
 import {
   getAbsoluteNoteForIdentity,
   absoluteNoteToIdentity,
@@ -27,3 +35,15 @@ export function notesForChord(chord: ChordIdentity, scale: Scale) {
     absoluteNoteToIdentity(x, scale)
   );
 }
+
+export const getAllTriads = (scale = C_MAJOR) =>
+  _.flatMap(_.range(MIDDLE_C, Interval.OCTAVE), note => [
+    {
+      root: absoluteNoteToIdentity(note, scale),
+      type: 'major',
+    },
+    {
+      root: absoluteNoteToIdentity(note, scale),
+      type: 'minor',
+    },
+  ]) as ChordIdentity[];

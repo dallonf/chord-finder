@@ -94,3 +94,7 @@ export function getNotesInScale(scale: Scale): NoteIdentity[] {
   }
   return notes.map(x => absoluteNoteToIdentity(tonic + x, scale));
 }
+
+export const noteEquals = (a: NoteIdentity, b: NoteIdentity) => {
+  return getAbsoluteNoteForIdentity(a) === getAbsoluteNoteForIdentity(b);
+};

@@ -1,10 +1,8 @@
 import * as React from 'react';
-import {
-  C_MAJOR,
-  NoteIdentity,
-  ChordIdentity,
-} from './theory/types';
+import { C_MAJOR, NoteIdentity, ChordIdentity } from './theory/types';
 import { notesForChord, getAllTriads } from './theory/chords';
+import { parseNotes, ParseNoteError } from './parse';
+import { noteEquals } from './theory/conversion';
 
 const ALL_TRIADS = getAllTriads();
 
@@ -38,23 +36,63 @@ const ChordName = ({ chord }: { chord: ChordIdentity }) => (
   </span>
 );
 
-class App extends React.Component {
+const Triad = ({ chord }: { chord: ChordIdentity }) => (
+  <React.Fragment>
+    {' '}
+    <strong>
+      <ChordName chord={chord} />:
+    </strong>{' '}
+    {notesForChord(chord, C_MAJOR).map((y, i, arr) => (
+      <React.Fragment key={i}>
+        <Note note={y} />
+        {i !== arr.length - 1 && ' '}
+      </React.Fragment>
+    ))}
+  </React.Fragment>
+);
+
+interface AppState {
+  filterNotesString: string;
+}
+
+class App extends React.Component<{}, AppState> {
+  state: AppState = {
+    filterNotesString: '',
+  };
+
   public render() {
+    let filterNotes: NoteIdentity[] = [];
+    let filterNotesError: ParseNoteError | undefined;
+    try {
+      filterNotes = parseNotes(this.state.filterNotesString);
+    } catch (err) {
+      if (err instanceof ParseNoteError) {
+        filterNotesError = err;
+      } else {
+        throw err;
+      }
+    }
+    const matchingTriads = ALL_TRIADS.filter(chord => {
+      const chordNotes = notesForChord(chord, C_MAJOR);
+      return filterNotes.every(filterNote =>
+        chordNotes.some(chordNote => noteEquals(chordNote, filterNote))
+      );
+    });
     return (
       <div>
-        <h1>Lots of triads</h1>
+        <input
+          type="text"
+          value={this.state.filterNotesString}
+          onChange={e => this.setState({ filterNotesString: e.target.value })}
+        />
+        {filterNotesError && (
+          <div style={{ color: 'red' }}>{filterNotesError.message}</div>
+        )}
+        <h2>Matching triads</h2>
         <ul>
-          {ALL_TRIADS.map((x, i) => (
+          {matchingTriads.map((x, i) => (
             <li key={i}>
-              <strong>
-                <ChordName chord={x} />:
-              </strong>{' '}
-              {notesForChord(x, C_MAJOR).map((y, i, arr) => (
-                <React.Fragment key={i}>
-                  <Note note={y} />
-                  {i !== arr.length - 1 && ' '}
-                </React.Fragment>
-              ))}
+              <Triad chord={x} />
             </li>
           ))}
         </ul>

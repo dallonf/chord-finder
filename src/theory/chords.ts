@@ -6,6 +6,7 @@ import {
   Scale,
   MIDDLE_C,
   C_MAJOR,
+  createChord,
 } from './types';
 import {
   getAbsoluteNoteForIdentity,
@@ -22,27 +23,28 @@ export function minorTriad(root: AbsoluteNote) {
 
 function absoluteNotesForChordIdentity(chord: ChordIdentity) {
   const absoluteRoot = getAbsoluteNoteForIdentity(chord.root);
+  let notes: AbsoluteNote[];
   switch (chord.type) {
     case 'major':
-      return majorTriad(absoluteRoot);
+      notes = majorTriad(absoluteRoot);
+      break;
     case 'minor':
-      return minorTriad(absoluteRoot);
-    case 'dominant7':
-      return [
-        ...majorTriad(absoluteRoot),
-        absoluteRoot + Interval.MINOR_SEVENTH,
-      ];
-    case 'major7':
-      return [
-        ...majorTriad(absoluteRoot),
-        absoluteRoot + Interval.MAJOR_SEVENTH,
-      ];
-    case 'minor7':
-      return [
-        ...majorTriad(absoluteRoot),
-        absoluteRoot + Interval.MINOR_SEVENTH,
-      ];
+      notes = minorTriad(absoluteRoot);
+      break;
+    default:
+      throw new Error(`Unrecognized chord type ${chord.type}`);
   }
+  chord.extensions.forEach(e => {
+    switch (e) {
+      case '7':
+        notes.push(absoluteRoot + Interval.MINOR_SEVENTH);
+        break;
+      case 'maj7':
+        notes.push(absoluteRoot + Interval.MAJOR_SEVENTH);
+        break;
+    }
+  });
+  return notes;
 }
 
 export function notesForChord(chord: ChordIdentity, scale: Scale) {
@@ -56,25 +58,10 @@ export const getAllTriads = (scale = C_MAJOR) =>
     _.range(MIDDLE_C, Interval.OCTAVE),
     note =>
       [
-        {
-          root: absoluteNoteToIdentity(note, scale),
-          type: 'major',
-        },
-        {
-          root: absoluteNoteToIdentity(note, scale),
-          type: 'minor',
-        },
-        {
-          root: absoluteNoteToIdentity(note, scale),
-          type: 'dominant7',
-        },
-        {
-          root: absoluteNoteToIdentity(note, scale),
-          type: 'major7',
-        },
-        {
-          root: absoluteNoteToIdentity(note, scale),
-          type: 'minor7',
-        },
+        createChord(absoluteNoteToIdentity(note, scale), 'major'),
+        createChord(absoluteNoteToIdentity(note, scale), 'minor'),
+        createChord(absoluteNoteToIdentity(note, scale), 'major', ['7']),
+        createChord(absoluteNoteToIdentity(note, scale), 'major', ['maj7']),
+        createChord(absoluteNoteToIdentity(note, scale), 'minor', ['7']),
       ] as ChordIdentity[]
   );

@@ -30,17 +30,11 @@ const ChordName = ({ chord }: { chord: ChordIdentity }) => (
           return undefined;
         case 'minor':
           return 'm';
-        case 'dominant7':
-          return '7';
-        case 'major7':
-          return 'maj7';
-        case 'minor7':
-          return 'm7';
-        // default:
-        //   throw new Error(`Unrecognized chord type "${chord.type}"`);
+        default:
+          throw new Error(`Unrecognized chord type "${chord.type}"`);
       }
-      // return undefined;
     })()}
+    {chord.extensions.map(e => <React.Fragment key={e}>{e}</React.Fragment>)}
   </span>
 );
 

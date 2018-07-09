@@ -27,6 +27,21 @@ function absoluteNotesForChordIdentity(chord: ChordIdentity) {
       return majorTriad(absoluteRoot);
     case 'minor':
       return minorTriad(absoluteRoot);
+    case 'dominant7':
+      return [
+        ...majorTriad(absoluteRoot),
+        absoluteRoot + Interval.MINOR_SEVENTH,
+      ];
+    case 'major7':
+      return [
+        ...majorTriad(absoluteRoot),
+        absoluteRoot + Interval.MAJOR_SEVENTH,
+      ];
+    case 'minor7':
+      return [
+        ...majorTriad(absoluteRoot),
+        absoluteRoot + Interval.MINOR_SEVENTH,
+      ];
   }
 }
 
@@ -37,13 +52,29 @@ export function notesForChord(chord: ChordIdentity, scale: Scale) {
 }
 
 export const getAllTriads = (scale = C_MAJOR) =>
-  _.flatMap(_.range(MIDDLE_C, Interval.OCTAVE), note => [
-    {
-      root: absoluteNoteToIdentity(note, scale),
-      type: 'major',
-    },
-    {
-      root: absoluteNoteToIdentity(note, scale),
-      type: 'minor',
-    },
-  ]) as ChordIdentity[];
+  _.flatMap(
+    _.range(MIDDLE_C, Interval.OCTAVE),
+    note =>
+      [
+        {
+          root: absoluteNoteToIdentity(note, scale),
+          type: 'major',
+        },
+        {
+          root: absoluteNoteToIdentity(note, scale),
+          type: 'minor',
+        },
+        {
+          root: absoluteNoteToIdentity(note, scale),
+          type: 'dominant7',
+        },
+        {
+          root: absoluteNoteToIdentity(note, scale),
+          type: 'major7',
+        },
+        {
+          root: absoluteNoteToIdentity(note, scale),
+          type: 'minor7',
+        },
+      ] as ChordIdentity[]
+  );

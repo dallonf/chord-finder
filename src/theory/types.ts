@@ -53,5 +53,5 @@ export const C_MAJOR: Scale = {
 };
 export interface ChordIdentity {
   root: NoteIdentity;
-  type: 'major' | 'minor';
+  type: 'major' | 'minor' | 'dominant7' | 'major7' | 'minor7';
 }
